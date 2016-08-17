@@ -1,0 +1,30 @@
+table {
+  width: 100%;
+
+  /*
+    grey
+    background-color: #d3d3d3;
+  */
+}
+
+td {
+  width: 50%;
+}
+
+#container {
+  margin: 10px 0;
+}
+
+.description {
+  text-align: left;
+  font-size: 17px;
+}
+
+.calendar {
+  text-align: right;
+}
+
+.calendar img {
+  width: 100px;
+  height: 100px;
+}

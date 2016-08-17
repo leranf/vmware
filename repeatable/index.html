@@ -1,0 +1,97 @@
+<html>
+  <head>
+    <title>Widget Example</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.6/angular.min.js"></script>
+    <script src="//wrap.co/widgets.js"></script>
+    <link rel="stylesheet" type="text/css" href="eventStyles.css" />
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans:regular,bold" rel="stylesheet">
+  </head>
+ 
+  <body ng-app="widget" bgcolor="white">
+    <div ng-controller="widgetController">
+      <div class="session_class" ng-repeat="session in sessions">
+        <div class="session_name">{{session.name}}</div>
+        <div class="event_class" ng-repeat="event in session.events">
+          <table class="agenda_event" style="background-color:{{$index % 2 ? 'white': '#F3F3F3'}};">
+            <tr>
+              <td>
+                <div class="descriptions">
+                  <div class="description_date_time">
+                    <p class="date">{{event.display.date}}</p>
+                    <p class="seperator">|</p>
+                    <p class="time">{{event.display.startTime}} - {{event.display.endTime}}</p> 
+                  </div>
+                  <div class="description_title">
+                    {{event.title}}
+                  </div>
+                  <div class="description_id">
+                    {{event.id}}
+                  </div>
+                </div>
+              </td>
+              <td>
+                <div class="calendar">
+                  <img ng-click="event.past ? null: addToCalendar(event)" src="./calendar_icon.png">
+                </div>
+              </td>
+            </tr>
+          </table>
+          <div class="overlay" ng-show="event.past"></div>
+        </div>
+      </div>
+    </div>
+
+    <script type="text/javascript">
+      angular.module('widget', []).controller('widgetController', function($scope) {
+        wrap.initialize().then(function() {
+          wrap.getWrapValues().then(function(values) {
+            $scope.sessions = values.metadata.sessions;
+            $scope.sessions.forEach(function(session) {
+              session.events.forEach(function(event) {
+                event.display = {};
+                var startDate = event.start.split(' ');
+                var endDate = event.end.split(' ');
+                event.display.date = startDate[0];
+                event.display.startTime = `${startDate[1]} ${startDate[2]}`;
+                event.display.endTime = `${endDate[1]} ${endDate[2]}`;
+                
+                var today = new Date().valueOf();
+                var parsedStartDate = startDate[0].split('/');
+                var startTime = startDate[1].split(':');
+                var period = startDate[2];
+
+                var month = parsedStartDate[0] - 1;
+                var day = parsedStartDate[1];
+                var year = `20${parsedStartDate[2]}`;
+                var hour = startTime[0];
+                if (period === 'PM' && hour !== '12') {
+                  hour = Number(startTime[0]) + 12;
+                }
+                var minutes = startTime[1];
+                var start = new Date(year, month, day, hour, minutes).valueOf();
+                if (today > start) {
+                  event.past = true;
+                }
+              });
+            });
+
+            $scope.addToCalendar = function(event) {
+              var url = 'https://widgets.wrap.co/addToCalendarModal?';
+              var keys = Object.keys(event);
+              keys.forEach(function(key, idx) {
+                if (key !== 'display' && key !== '$$hashKey') {
+                  var appendStr = `&${key}=${encodeURIComponent(event[key])}`;
+                  url += appendStr;
+                }
+              });
+              wrap.openModal(url);
+            };
+            $scope.$apply();      
+          });
+        });
+      });
+    </script>
+   
+  </body>
+  
+</html>

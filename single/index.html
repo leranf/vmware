@@ -1,0 +1,72 @@
+<html>
+  <head>
+    <title>Widget Example</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.6/angular.min.js"></script>
+    <script src="//wrap.co/widgets.js"></script>
+    <link rel="stylesheet" type="text/css" href="eventStyles.css">
+  </head>
+ 
+  <body ng-app="widget" bgcolor="white">
+    <div ng-controller="widgetController">
+      <div id="container" style ="text-decoration:{{past ? 'line-through': 'none'}};">
+        <table>
+          <tr>
+            <td>
+              <div class="description" id="date">
+                {{date}}
+              </div>
+              <div class="description" id="title">
+                {{title}}
+              </div>
+              <div class="description" id="location">
+                {{location}}
+              </div>
+              <div class="description" id="time">
+                {{startTime}} - {{endTime}}
+              </div>
+            </td>
+            <td>
+              <div class="calendar">
+                <img ng-click="past ? null: addToCalendar()" src="https://addtocalendar.com/static/cal-icon/cal-bw-01.png">
+              </div>
+            </td>
+          </tr>
+        </table>
+      </div>
+    </div>
+
+    <script type="text/javascript">
+      angular.module('widget', []).controller('widgetController', function($scope) {
+        var paramsURL = window.location.search;
+        var params = window.location.search.slice(1).split('&');
+        var paramsObj = {};
+        params.forEach(function(param) {
+          var newParam = param.split('=');
+          paramsObj[newParam[0]] = decodeURIComponent(newParam[1]);
+          $scope[newParam[0]] = decodeURIComponent(newParam[1]);
+        });
+        var today = new Date();
+        var day = today.getDate();
+        var month = today.getMonth() + 1;
+        var year = today.getFullYear() - 2000;
+        var startDate = paramsObj.start.split(' ');
+        var endDate = paramsObj.end.split(' ');
+        $scope.date = startDate[0];
+        $scope.startTime = `${startDate[1]} ${startDate[2]}`;
+        $scope.endTime = `${endDate[1]} ${endDate[2]}`;
+
+        var parsedStartDate = startDate[0].split('/');
+        if (year >= Number(parsedStartDate[2]) && month >= Number(parsedStartDate[0]) && day > Number(parsedStartDate[1])) {
+          $scope.past = true;
+        }
+
+        $scope.addToCalendar = function(event) {
+          var url = 'https://widgets.wrap.co/addToCalendarModal';
+          wrap.openModal(`${url}${paramsURL}`);
+        };
+      });
+    </script>
+   
+  </body>
+  
+</html>

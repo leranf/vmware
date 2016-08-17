@@ -1,0 +1,68 @@
+body  {
+  width: 640px;
+  margin: 0;
+}
+
+.session_class {
+  margin-top: 25px;
+}
+
+.session_name {
+  color: #6DB33F;
+  font-size: 36px;
+  font-family: 'Open Sans', sans-serif;
+  margin: 0 0 12px 57px;
+}
+
+.event_class {
+  position: relative;
+  margin: 0 23px 0 22px;
+}
+
+.event_class .overlay {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  background: #F3F3F3;
+  opacity: 0.8;
+}
+
+.agenda_event {
+  width: 595px;
+}
+
+.descriptions {
+  font-size: 22px;
+  line-height: 140%;
+  font-family: 'Open Sans', sans-serif;
+  margin: 30px 0px 30px 35px;
+}
+
+.calendar {
+  text-align: right;
+  margin: 35px 35px 35px 0;
+}
+
+.description_date_time p {
+  display: inline;
+  color: #333333;
+}
+
+.seperator {
+  margin: 0 5px;
+  text-align: center;
+}
+
+.date, .description_title {
+  font-weight: bold;
+}
+
+.description_title {
+  color: #6DB33F;
+}
+
+.description_id {
+  color: #A9A9A9;
+}
