@@ -1,97 +1,243 @@
 <html>
   <head>
-    <title>Widget Example</title>
-    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.6/angular.min.js"></script>
+    <title>VMware</title>
     <script src="//wrap.co/widgets.js"></script>
-    <link rel="stylesheet" type="text/css" href="eventStyles.css" />
     <link href="https://fonts.googleapis.com/css?family=Open+Sans:regular,bold" rel="stylesheet">
+    <style>
+      body  {
+        width: 640px;
+        margin: 0;
+      }
+
+      .deep_links {
+        margin-left: 57px;
+        color: #6A5D5D;
+        font-size: 23px;
+        font-family: 'Open Sans', sans-serif;
+        font-weight: bold;
+        line-height: 140%;
+      }
+
+      .deep_links p {
+        display: inline;
+      }
+
+      .deep_links .char {
+        font-size: 15px;
+      }
+
+      hr {
+        color: #D4D4D4;
+      }
+
+      .first_break {
+        margin: 40px 0;
+      }
+
+      .session_class {
+        margin: 40px 0 40px 0;
+      }
+
+      .session_name {
+        color: #6DB33F;
+        font-size: 36px;
+        font-family: 'Open Sans', sans-serif;
+        margin: 0 0 15px 57px;
+      }
+
+      .event_class {
+        position: relative;
+        margin: 0 23px 0 22px;
+      }
+
+      .event_class .overlay {
+        display: none;
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        top: 0;
+        left: 0;
+        background: #F3F3F3;
+        opacity: 0.8;
+      }
+
+      .agenda_event {
+        width: 595px;
+      }
+
+      .descriptions {
+        font-size: 22px;
+        line-height: 140%;
+        font-family: 'Open Sans', sans-serif;
+        margin: 30px 0px 30px 35px;
+      }
+
+      .calendar {
+        text-align: right;
+        margin: 35px 35px 35px 0;
+      }
+
+      .description_date_time p {
+        display: inline;
+        color: #333333;
+      }
+
+      .seperator {
+        margin: 0 5px;
+        text-align: center;
+      }
+
+      .date, .description_title {
+        font-weight: bold;
+      }
+
+      .description_title {
+        color: #6DB33F;
+      }
+
+      .description_id {
+        color: #A9A9A9;
+      }
+    </style>
   </head>
  
-  <body ng-app="widget" bgcolor="white">
-    <div ng-controller="widgetController">
-      <div class="session_class" ng-repeat="session in sessions">
-        <div class="session_name">{{session.name}}</div>
-        <div class="event_class" ng-repeat="event in session.events">
-          <table class="agenda_event" style="background-color:{{$index % 2 ? 'white': '#F3F3F3'}};">
-            <tr>
-              <td>
-                <div class="descriptions">
-                  <div class="description_date_time">
-                    <p class="date">{{event.display.date}}</p>
-                    <p class="seperator">|</p>
-                    <p class="time">{{event.display.startTime}} - {{event.display.endTime}}</p> 
-                  </div>
-                  <div class="description_title">
-                    {{event.title}}
-                  </div>
-                  <div class="description_id">
-                    {{event.id}}
-                  </div>
-                </div>
-              </td>
-              <td>
-                <div class="calendar">
-                  <img ng-click="event.past ? null: addToCalendar(event)" src="./calendar_icon.png">
-                </div>
-              </td>
-            </tr>
-          </table>
-          <div class="overlay" ng-show="event.past"></div>
-        </div>
+  <body bgcolor="white">
+    
+    <div class="deep_links">
+      <div class="Introductory">
+        <p>Introductory</p>
+        <p class="char">></p>
+      </div>
+      <div class="Customer Panels">
+        <p>Customer Panels</p>
+        <p class="char">></p>
+      </div>
+      <div class="Customer Quick Talks">
+        <p>Customer Quick Talks</p>
+        <p class="char">></p>
+      </div>
+      <div class="Spotlight">
+        <p>Spotlight</p>
+        <p class="char">></p>
       </div>
     </div>
 
+    <hr class="first_break">
+
+    <div class="sessions_container"></div>
+
+    <template class="session_template_class">
+      <div class="session_class">
+        <div class="session_name"></div>
+      </div>
+      <hr class="new_line">
+    </template>
+
+    <template class="event_template_class">
+      <div class="event_class">
+        <table class="agenda_event">
+          <tr>
+            <td>
+              <div class="descriptions">
+                <div class="description_date_time">
+                  <p class="date"></p>
+                  <p class="seperator">|</p>
+                  <p class="time"></p> 
+                </div>
+                <div class="description_title"></div>
+                <div class="description_id"></div>
+              </div>
+            </td>
+            <td>
+              <div class="calendar">
+                <img class="calendar_icon" src="./calendar_icon.png">
+              </div>
+            </td>
+          </tr>
+        </table>
+        <div class="overlay"></div>
+      </div>
+    </template>
+
     <script type="text/javascript">
-      angular.module('widget', []).controller('widgetController', function($scope) {
-        wrap.initialize().then(function() {
-          wrap.getWrapValues().then(function(values) {
-            $scope.sessions = values.metadata.sessions;
-            $scope.sessions.forEach(function(session) {
-              session.events.forEach(function(event) {
-                event.display = {};
-                var startDate = event.start.split(' ');
-                var endDate = event.end.split(' ');
-                event.display.date = startDate[0];
-                event.display.startTime = `${startDate[1]} ${startDate[2]}`;
-                event.display.endTime = `${endDate[1]} ${endDate[2]}`;
-                
-                var today = new Date().valueOf();
-                var parsedStartDate = startDate[0].split('/');
-                var startTime = startDate[1].split(':');
-                var period = startDate[2];
+      wrap.initialize().then(function() {
+        wrap.getWrapValues().then(function(values) {
+          var sessions = values.metadata.sessions;
 
-                var month = parsedStartDate[0] - 1;
-                var day = parsedStartDate[1];
-                var year = `20${parsedStartDate[2]}`;
-                var hour = startTime[0];
-                if (period === 'PM' && hour !== '12') {
-                  hour = Number(startTime[0]) + 12;
-                }
-                var minutes = startTime[1];
-                var start = new Date(year, month, day, hour, minutes).valueOf();
-                if (today > start) {
-                  event.past = true;
-                }
-              });
+          if ('content' in document.createElement('template')) {
+            var sessionTemplate = document.querySelector('.session_template_class');
+            var sessionClass = sessionTemplate.content.querySelector('.session_class');
+            var sessionName = sessionTemplate.content.querySelector('.session_name');
+            var newLine = sessionTemplate.content.querySelector('.new_line');
+
+            var eventTemplate = document.querySelector('.event_template_class');
+            var table = eventTemplate.content.querySelector('.agenda_event');
+            var date = eventTemplate.content.querySelector('.date');
+            var time = eventTemplate.content.querySelector('.time');
+            var title = eventTemplate.content.querySelector('.description_title');
+            var id = eventTemplate.content.querySelector('.description_id');
+            var overlay = eventTemplate.content.querySelector('.overlay');
+          }
+
+          sessions.forEach(function(session, i) {
+            sessionName.innerHTML = `<a name=${session.name.split(' ').join('_')}>${session.name}</a>`;
+
+            if (i === sessions.length - 1) {
+              newLine.style.display = 'none';
+            }
+            var sessionClone = document.importNode(sessionTemplate.content, true);
+            var sc = document.querySelector('.sessions_container');
+            sc.appendChild(sessionClone);
+            
+            session.events.forEach(function(event, idx) {
+              var currentSession = document.querySelectorAll('.session_class')[i];
+              event.display = {};
+              var startDate = event.start.split(' ');
+              var endDate = event.end.split(' ');
+              date.innerHTML = startDate[0];
+              time.innerHTML = `${startDate[1]} ${startDate[2]} - ${endDate[1]} ${endDate[2]}`;
+              title.innerHTML = event.title;
+              id.innerHTML = event.id;
+              
+              idx % 2 === 0 ? table.style.backgroundColor = '#F3F3F3' : table.style.backgroundColor = 'white';
+
+              var today = new Date().valueOf();
+              var parsedStartDate = startDate[0].split('/');
+              var startTime = startDate[1].split(':');
+              var period = startDate[2];
+              var month = parsedStartDate[0] - 1;
+              var day = parsedStartDate[1];
+              var year = `20${parsedStartDate[2]}`;
+              var hour = startTime[0];
+              var minutes = startTime[1];
+              
+              if (period === 'PM' && hour !== '12') hour = Number(startTime[0]) + 12;
+              var start = new Date(year, month, day, hour, minutes).valueOf();
+              
+              today > start ? overlay.style.display = 'block' : overlay.style.display = 'none';
+
+              var eventClone = document.importNode(eventTemplate.content, true);
+              currentSession.appendChild(eventClone);
+              
+              var currentEvent = currentSession.querySelectorAll('.agenda_event')[idx];
+              if (today < start) {
+                currentEvent.querySelector('.calendar_icon').addEventListener('click', function() {
+                  var url = 'https://widgets.wrap.co/addToCalendarModal?';
+                  var keys = Object.keys(event);
+                  keys.forEach(function(key, idx) {
+                    if (key !== 'display') {
+                      var appendStr = `&${key}=${encodeURIComponent(event[key])}`;
+                      url += appendStr;
+                    }
+                  });
+                  wrap.openModal(url);
+                });
+              }
             });
-
-            $scope.addToCalendar = function(event) {
-              var url = 'https://widgets.wrap.co/addToCalendarModal?';
-              var keys = Object.keys(event);
-              keys.forEach(function(key, idx) {
-                if (key !== 'display' && key !== '$$hashKey') {
-                  var appendStr = `&${key}=${encodeURIComponent(event[key])}`;
-                  url += appendStr;
-                }
-              });
-              wrap.openModal(url);
-            };
-            $scope.$apply();      
           });
         });
       });
     </script>
    
   </body>
-  
 </html>
